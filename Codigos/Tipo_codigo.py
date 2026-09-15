@@ -1,3 +1,23 @@
+import math 
+
+def InecuacionKraft(cod, listaALF):
+    r = len(listaALF)
+    aux = 0
+    for x in cod:
+        aux += r ** -len(x)
+    return aux
+
+def Listas(cod, listaALF, listaLong):
+
+    long = len(cod)
+
+    for x in cod:
+        listaLong.append(len(x))
+        long = len(x)
+        for i in range(long):
+            if x[i] not in listaALF:
+                listaALF.append(x[i])       
+
 def nosingular(cod):
     if(len(cod) != len(set(cod))):
         return False
@@ -59,7 +79,28 @@ def univocamente_decodificable(cod):
             S_i = S_siguiente
 
 
-cod = [".,", ";", ",,", ":", "...", ",:;"]
+def Long_media(listaPro, listaLong):
+    aux = 0
+    for i in range(len(listaPro)):
+        aux += listaPro[i] * listaLong[i]
+    return aux
+
+
+def Entropia(lista, listaInfo):
+    i = 0
+    entropia = 0
+    for num in lista:
+        entropia += num * listaInfo[i]
+        i = i + 1
+    return entropia
+
+def Generolista (lista, listaInfo, listaLong):
+    r = len(listaALF)
+    for num in lista:
+         listaInfo.append(math.log(1/num, r))
+
+cod = ["AAB", "ACC", "BB", "CB"]
+listaPro = [0.2, 0.1, 0.5, 0.2]
 print(cod)
 
 if(nosingular(cod)):
@@ -75,3 +116,25 @@ if(nosingular(cod)):
         print("No es Instantaneo")
 else:
     print("Es Singular")
+
+
+listaALF = []
+listaLong = []
+Listas(cod, listaALF, listaLong)
+print("Lista alfabeto: ", listaALF)
+print("Lista Li", listaLong)
+
+kraft = InecuacionKraft(cod, listaALF)
+print("Kraft: ", kraft)
+
+listaInfo = []
+
+Generolista(listaPro, listaInfo, listaLong)
+entropia = Entropia(listaPro, listaInfo)
+print("Entropia de la Fuente: ", entropia)
+
+L_media = Long_media(listaPro, listaLong)
+
+print("Longitud media: ", L_media)
+
+
