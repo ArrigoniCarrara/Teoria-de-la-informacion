@@ -1,5 +1,5 @@
 import math 
-
+from Fuente_montecarlo import Montecarlo
 def InecuacionKraft(cod, listaALF):
     r = len(listaALF)
     aux = 0
@@ -94,13 +94,25 @@ def Entropia(lista, listaInfo):
         i = i + 1
     return entropia
 
-def Generolista (lista, listaInfo, listaLong):
+def Generolista (lista, listaInfo):
     r = len(listaALF)
+    print("T(Pi): ")
     for num in lista:
          listaInfo.append(math.log(1/num, r))
+         print("I(", num, ") = ", math.log(1/num, r))
 
-cod = ["AAB", "ACC", "BB", "CB"]
-listaPro = [0.2, 0.1, 0.5, 0.2]
+def Compacto(cod, listaInfo, listaLong):
+    bool = True
+    if(univocamente_decodificable(cod)):
+        for i in range(len(listaInfo)):
+            if(math.ceil(listaInfo[i]) < listaLong[i]):
+                bool = False
+                break
+
+    return bool
+
+cod = [".,", ";", ",,", ":", "...", ",:;"]
+listaPro = [0.10, 0.5, 0.10, 0.20, 0.05, 0.05]
 print(cod)
 
 if(nosingular(cod)):
@@ -122,19 +134,27 @@ listaALF = []
 listaLong = []
 Listas(cod, listaALF, listaLong)
 print("Lista alfabeto: ", listaALF)
-print("Lista Li", listaLong)
+print("Lista Li: ", listaLong)
 
 kraft = InecuacionKraft(cod, listaALF)
 print("Kraft: ", kraft)
+if (univocamente_decodificable(cod)):
+    listaInfo = []
 
-listaInfo = []
+    Generolista(listaPro, listaInfo)
+    entropia = Entropia(listaPro, listaInfo)
+    print("Entropia de la Fuente: ", entropia)
 
-Generolista(listaPro, listaInfo, listaLong)
-entropia = Entropia(listaPro, listaInfo)
-print("Entropia de la Fuente: ", entropia)
+    L_media = Long_media(listaPro, listaLong)
 
-L_media = Long_media(listaPro, listaLong)
+    print("Longitud media: ", L_media)
 
-print("Longitud media: ", L_media)
+    if(Compacto(cod, listaInfo, listaLong)):
+        print("Es Compacto")
+    else:
+        print("No es Compacto")
 
-
+n = int(input())
+prediccion = []
+Montecarlo(n, cod, listaPro, prediccion)
+print(prediccion)
