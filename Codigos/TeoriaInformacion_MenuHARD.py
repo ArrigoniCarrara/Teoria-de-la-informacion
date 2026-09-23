@@ -79,7 +79,6 @@ def multiplicar_matriz_por_vector(matriz, vector):
         suma_probabilidades = 0.0
         
         for columna in range(n):
-            # Cambiamos el orden geométrico de la multiplicación
             suma_probabilidades += matriz[fila][columna] * vector[columna]
             
         vector_resultado[fila] = suma_probabilidades
@@ -403,8 +402,8 @@ def menu_secuencia():
 # ==========================================================================
 
 # ---------------- DATOS DE ENTRADA (editar aca) --------------------------
-COD_6 = [")", "[]", "]]", "([", "[()]", "([)]"]           # Ingresa Codigo, ej: ["0", "10", "110", "111"]
-LISTAPRO_6 = [0.1, 0.50, 0.1, 0.2, 0.05, 0.05]       # Probabilidades de cada palabra-codigo, ej: [0.5, 0.25, 0.125, 0.125]
+COD_6 = []           # Ingresa Codigo, ej: ["0", "10", "110", "111"]
+LISTAPRO_6 = []       # Probabilidades de cada palabra-codigo, ej: [0.5, 0.25, 0.125, 0.125]
 N_MONTECARLO_6 = 5     # cantidad de simbolos a predecir con Monte Carlo (al final)
 # ---------------------------------------------------------------------------
 
