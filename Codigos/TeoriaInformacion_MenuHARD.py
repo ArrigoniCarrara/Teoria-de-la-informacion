@@ -44,9 +44,10 @@ def entropia_simple(lista, listaInfo):
 
 def generar_lista_info_simple(lista, listaInfo):
     for num in lista:
-        # Si la probabilidad es 0, log2(1/0) da error (matematicamente
-        # seria infinito): no incluir simbolos con probabilidad 0 aca.
-        listaInfo.append(log2(1 / num))
+        if(num != 0):
+            listaInfo.append(log2(1 / num))
+        else:
+            listaInfo.append(0)
 
 
 def menu_entropia_simple():
@@ -69,72 +70,43 @@ MATRIZ_2 = []  # Ejemplo: [[0.5, 0.3], [0.5, 0.7]]
 # ---------------------------------------------------------------------------
 
 
-def es_ergodica(M):
-    """
-    Verifica si la fuente markoviana M es ergodica: comprueba que el
-    grafo de transiciones sea fuertemente conexo, es decir, que desde
-    cada estado exista un camino (directo o compuesto por varios
-    pasos) hacia todos los demas estados, y viceversa.
-    """
-    n = len(M)
-    if n == 0 or any(len(fila) != n for fila in M):
-        raise ValueError("La matriz debe ser cuadrada (n x n) y no vacia.")
-
-    directo = [[j for j in range(n) if M[i][j] > 0] for i in range(n)]
-    inverso = [[i for i in range(n) if M[i][j] > 0] for j in range(n)]
-
-    def alcanzables(adyacencia, inicio):
-        visitados = {inicio}
-        pendientes = [inicio]
-        while pendientes:
-            actual = pendientes.pop()
-            for vecino in adyacencia[actual]:
-                if vecino not in visitados:
-                    visitados.add(vecino)
-                    pendientes.append(vecino)
-        return visitados
-
-    return len(alcanzables(directo, 0)) == n and len(alcanzables(inverso, 0)) == n
+def multiplicar_matriz_por_vector(matriz, vector):
+   
+    n = len(vector)
+    vector_resultado = [0.0] * n
+    
+    for fila in range(n):
+        suma_probabilidades = 0.0
+        
+        for columna in range(n):
+            # Cambiamos el orden geométrico de la multiplicación
+            suma_probabilidades += matriz[fila][columna] * vector[columna]
+            
+        vector_resultado[fila] = suma_probabilidades
+        
+    return vector_resultado
 
 
-def vector_estacionario(M):
-    """
-    Calcula el vector estacionario V* de la fuente markoviana M, mediante
-    eliminacion gaussiana con pivoteo parcial, sin librerias externas.
-    """
-    n = len(M)
-    if n == 0 or any(len(fila) != n for fila in M):
-        raise ValueError("La matriz debe ser cuadrada (n x n) y no vacia.")
+def vector_estacionario(matriz_transicion, tolerancia=0.001):
 
-    if not es_ergodica(M):
-        raise ValueError(
-            "La fuente no es ergodica: no existe un camino que conecte "
-            "todos los estados entre si, por lo que no hay un unico "
-            "vector estacionario."
-        )
-
-    A = [[M[i][j] - (1.0 if i == j else 0.0) for j in range(n)] for i in range(n)]
-    aug = [fila[:] + [0.0] for fila in A]
-    aug[-1] = [1.0] * n + [1.0]
-
-    for col in range(n):
-        fila_pivote = max(range(col, n), key=lambda r: abs(aug[r][col]))
-        if abs(aug[fila_pivote][col]) < 1e-12:
-            continue
-        aug[col], aug[fila_pivote] = aug[fila_pivote], aug[col]
-
-        pivote = aug[col][col]
-        aug[col] = [valor / pivote for valor in aug[col]]
-
-        for f in range(n):
-            if f != col:
-                factor = aug[f][col]
-                if factor != 0:
-                    aug[f] = [aug[f][k] - factor * aug[col][k] for k in range(n + 1)]
-
-    v = [aug[i][n] for i in range(n)]
-    return [0.0 if abs(x) < 1e-12 else x for x in v]
-
+    cantidad_estados = len(matriz_transicion)
+    vector_actual = [1.0 / cantidad_estados] * cantidad_estados
+    
+    while True:
+        vector_siguiente = multiplicar_matriz_por_vector(matriz_transicion, vector_actual)
+        
+        se_estabilizo = True
+        for i in range(cantidad_estados):
+            diferencia = abs(vector_siguiente[i] - vector_actual[i])
+            
+            if diferencia >= tolerancia:
+                se_estabilizo = False
+                break
+                
+        if se_estabilizo:
+            return vector_siguiente
+            
+        vector_actual = vector_siguiente
 
 def entropia_matriz_aux(lista, listaInfo):
     entropia = 0
@@ -168,17 +140,15 @@ def obtener_entropia_matriz(matriz, vector):
 def menu_entropia_matriz():
     print("\n--- ENTROPIA DE UNA FUENTE MARKOVIANA / CON MEMORIA (Entropia_Matriz.py) ---")
     matriz = MATRIZ_2
-    if not matriz:
-        print("MATRIZ_2 esta vacia. Cargala en el bloque de datos de entrada arriba.")
-        return
+    
 
-    if es_ergodica(matriz):
-        vector = vector_estacionario(matriz)
-        print("Vector estacionario:", vector)
-        entropia = obtener_entropia_matriz(matriz, vector)
-        print("Entropia de la fuente:", entropia)
-    else:
-        print("La fuente no es ergodica")
+    
+    vector = vector_estacionario(matriz)
+    print("Vector estacionario:", vector)
+    entropia = obtener_entropia_matriz(matriz, vector)
+    print("Entropia de la fuente:", entropia)
+    
+        
 
 
 # ==========================================================================
@@ -199,7 +169,7 @@ def listas_paralelas(cadena, listaALF, listaPro):
             listaALF.append(char)
             listaPro.append(cadena.count(char) / long)
 
-    parejas_ordenadas = sorted(zip(listaALF, listaPro), key=lambda x: ord(x[0]))
+    parejas_ordenadas = sorted(zip(listaALF, listaPro), key=lambda x: ord(x[0])) # Ordeno los eventos para mayor comodidad (en el orden que corresponda)
 
     listaALF.clear()
     listaPro.clear()
@@ -232,16 +202,21 @@ def menu_fuente_montecarlo():
     print("\n--- FUENTE SIN MEMORIA + MONTE CARLO (Fuente_montecarlo.py) ---")
     cadena = CADENA_3
     num = NUM_3
-
+    listaInfo = []
     listaALF = []
     listaPro = []
     prediccion = []
     listas_paralelas(cadena, listaALF, listaPro)
+    # Si es una cadena de caracteres con probabilidades ya generadas escribir listaPRO aca abajo
+    generar_lista_info_simple(listaPro, listaInfo)
+    entropia = entropia_simple(listaPro, listaInfo)
     montecarlo_fuente(num, listaALF, listaPro, prediccion)
 
     print("Cadena:", cadena)
     print("Alfabeto:", listaALF)
     print("Probabilidades:", listaPro)
+    print("Cantidad de informacion (I(i)): ", listaInfo)
+    print("Entropia H(S): ", entropia)
     print("Prediccion:", prediccion)
 
 
@@ -290,7 +265,6 @@ def obtener_matriz(cadena, listaALF, matriz):
     """
     matriz[i][j] = P(siguiente = listaALF[i] | actual = listaALF[j])
     Fila = simbolo siguiente (destino), Columna = simbolo actual (origen).
-    Cada columna suma 1.
     """
     n = len(listaALF)
     conteo = [[0] * n for _ in range(n)]
@@ -374,9 +348,10 @@ def menu_fuente_matriz_montecarlo():
     matriz = []
     obtener_matriz(cadena, listaALF, matriz)
 
-    tolerancia = 0.2
+    tolerancia = 0.01
     tipo_de_memoria(matriz, tolerancia)
     print("-------------------")
+    print("Entropia: ", obtener_entropia_matriz(matriz, vector_estacionario(matriz)))
     imprimir_matriz(matriz, listaALF)
     print("-----MATRIZ PARA COPIAR-----")
     print(matriz)
@@ -390,9 +365,9 @@ def menu_fuente_matriz_montecarlo():
 # ==========================================================================
 
 # ---------------- DATOS DE ENTRADA (editar aca) --------------------------
-ALFABETO_5 = ['x', 'y', 'z']
-DISTRIBUCION_5 = [0.5, 0.1, 0.4]
-N_5 = 3
+ALFABETO_5 = []
+DISTRIBUCION_5 = []
+N_5 = 0
 # ---------------------------------------------------------------------------
 
 
@@ -428,8 +403,8 @@ def menu_secuencia():
 # ==========================================================================
 
 # ---------------- DATOS DE ENTRADA (editar aca) --------------------------
-COD_6 = []           # Ingresa Codigo, ej: ["0", "10", "110", "111"]
-LISTAPRO_6 = []       # Probabilidades de cada palabra-codigo, ej: [0.5, 0.25, 0.125, 0.125]
+COD_6 = [")", "[]", "]]", "([", "[()]", "([)]"]           # Ingresa Codigo, ej: ["0", "10", "110", "111"]
+LISTAPRO_6 = [0.1, 0.50, 0.1, 0.2, 0.05, 0.05]       # Probabilidades de cada palabra-codigo, ej: [0.5, 0.25, 0.125, 0.125]
 N_MONTECARLO_6 = 5     # cantidad de simbolos a predecir con Monte Carlo (al final)
 # ---------------------------------------------------------------------------
 
@@ -611,7 +586,7 @@ def menu_tipo_codigo():
 # ==========================================================================
 
 # ---------------- DATOS DE ENTRADA (editar aca) --------------------------
-W_7 = 0.5
+W_7 = 0
 # ---------------------------------------------------------------------------
 
 
