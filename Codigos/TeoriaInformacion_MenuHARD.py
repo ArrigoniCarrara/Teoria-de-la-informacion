@@ -66,9 +66,8 @@ def menu_entropia_simple():
 
 # ---------------- DATOS DE ENTRADA (editar aca) --------------------------
 # matriz[i][j] = P(siguiente = i | actual = j)  -> cada COLUMNA suma 1
-MATRIZ_2 = []  # Ejemplo: [[0.5, 0.3], [0.5, 0.7]]
+MATRIZ_2 = [[0.0, 0.0, 0.22727272727272727, 0.1111111111111111], [0.3333333333333333, 0.0, 0.3181818181818182, 0.3333333333333333], [0.5, 0.5833333333333334, 0.36363636363636365, 0.4444444444444444], [0.16666666666666666, 0.4166666666666667, 0.09090909090909091, 0.1111111111111111]]  # Ejemplo: [[0.5, 0.3], [0.5, 0.7]]
 # ---------------------------------------------------------------------------
-
 
 def multiplicar_matriz_por_vector(matriz, vector):
    
@@ -224,7 +223,7 @@ def menu_fuente_montecarlo():
 # ==========================================================================
 
 # ---------------- DATOS DE ENTRADA (editar aca) --------------------------
-CADENA_4 = ""  # Ingresa cadena de entrenamiento
+CADENA_4 = ".;.:.:.::;:,::.;:,::,;,:;.:.;.;;:,.::.:,.:.;:::::."  # Ingresa cadena de entrenamiento
 N_4 = 20        # longitud de la nueva cadena a generar
 # ---------------------------------------------------------------------------
 
@@ -343,6 +342,7 @@ def menu_fuente_matriz_montecarlo():
     listaPro = []
     listas_paralelas(cadena, listaALF, listaPro)
     print("Alfabeto", listaALF)
+    print("Lista Probabilidades: ", listaPro) # si la fuente es de memoria la probabilidad de cada evento acá
 
     matriz = []
     obtener_matriz(cadena, listaALF, matriz)
@@ -350,6 +350,7 @@ def menu_fuente_matriz_montecarlo():
     tolerancia = 0.01
     tipo_de_memoria(matriz, tolerancia)
     print("-------------------")
+    # En el caso que sea una fuente sin memoria la funcion vector_estacionario calcularia el vector de probabilidades de la fuente, asi que no hace falta calcualr la entropia de manera distinta
     print("Entropia: ", obtener_entropia_matriz(matriz, vector_estacionario(matriz)))
     imprimir_matriz(matriz, listaALF)
     print("-----MATRIZ PARA COPIAR-----")
@@ -366,7 +367,7 @@ def menu_fuente_matriz_montecarlo():
 # ---------------- DATOS DE ENTRADA (editar aca) --------------------------
 ALFABETO_5 = []
 DISTRIBUCION_5 = []
-N_5 = 0
+N_5 = 2
 # ---------------------------------------------------------------------------
 
 
@@ -392,9 +393,13 @@ def menu_secuencia():
     print("\n--- EXTENSION DE UNA FUENTE DE ORDEN N (Secuencia.py) ---")
     nuevoAlf = []
     nuevoPro = []
+    listaInfo = []
     extension_fuente(ALFABETO_5, DISTRIBUCION_5, N_5, nuevoAlf, nuevoPro)
     print("Nuevo alfabeto:", nuevoAlf)
     print("Nuevas probabilidades:", nuevoPro)
+    generar_lista_info_simple(nuevoPro, listaInfo)
+    entropia = entropia_simple(nuevoPro, listaInfo)
+    print("Entropia  N . H(S): ", entropia)
 
 
 # ==========================================================================
@@ -402,8 +407,8 @@ def menu_secuencia():
 # ==========================================================================
 
 # ---------------- DATOS DE ENTRADA (editar aca) --------------------------
-COD_6 = []           # Ingresa Codigo, ej: ["0", "10", "110", "111"]
-LISTAPRO_6 = []       # Probabilidades de cada palabra-codigo, ej: [0.5, 0.25, 0.125, 0.125]
+COD_6 = ["/+", "*", "+-", "-", "*/"]           # Ingresa Codigo, ej: ["0", "10", "110", "111"]
+LISTAPRO_6 = [0.15, 0.25, 0.05, 0.45, 0.10]       # Probabilidades de cada palabra-codigo, ej: [0.5, 0.25, 0.125, 0.125]
 N_MONTECARLO_6 = 5     # cantidad de simbolos a predecir con Monte Carlo (al final)
 # ---------------------------------------------------------------------------
 
@@ -439,8 +444,7 @@ def instantaneo(cod):
         return False
     return True
 
-
-def univocamente_decodificable(cod):
+def univocamente_decodificable(cod): # Solo para verificacion compacto
     if nosingular(cod):
         if instantaneo(cod):
             return True
@@ -476,6 +480,59 @@ def univocamente_decodificable(cod):
             S_i = S_siguiente
     return False
 
+def univocamente_decodificable_print(cod): #Imprime sardinas_patterson
+    if not nosingular(cod):
+        return False
+
+    if instantaneo(cod):
+        return True
+    
+    print("----- Sardinas-Patterson -----")
+
+    C0 = set(cod)
+    print(f"S0 = {C0}  (palabras código)")
+
+    conjuntos_vistos = []
+    S_anterior = C0   # primera vuelta compara C0 contra sí mismo -> genera C1
+    n = 1
+
+    while True:
+        S_nuevo = set()
+
+        for x in C0:
+            for y in S_anterior:
+                if x != y:
+                    if y.startswith(x):
+                        S_nuevo.add(y[len(x):])
+                    elif x.startswith(y):
+                        S_nuevo.add(x[len(y):])
+
+        print(f"S{n} = {S_nuevo}")
+
+        # conjunto vacío
+        if not S_nuevo:
+            print(f"-> S{n} salió vacío. El proceso se cierra sin tocar S0.")
+            print("Conclusión: el código ES Unívocamente Decodificable.")
+            return True
+
+        # aparece una palabra de S0
+        interseccion = S_nuevo & C0
+        if interseccion:
+            print(f"-> S{n} contiene {interseccion}, que pertenece a S0.")
+            print("Conclusión: el código NO es Unívocamente Decodificable.")
+            return False
+
+        # el conjunto ya había aparecido 
+        if S_nuevo in conjuntos_vistos:
+            print(f"-> S{n} ya había aparecido en un paso anterior.")
+            print("Conclusión: el código ES Unívocamente Decodificable.")
+            return True
+
+        conjuntos_vistos.append(S_nuevo)
+        S_anterior = S_nuevo
+        n += 1
+    
+    print("----- Fin Sardinas-Patterson -----")
 
 def long_media(listaPro, listaLong):
     aux = 0
@@ -534,19 +591,17 @@ def menu_tipo_codigo():
     listaPro = LISTAPRO_6
     print(cod)
 
-    if nosingular(cod):
-        print("Es No Singular")
-        if instantaneo(cod):
-            print("Es Univocamente Decodificable")
-            print("Es Instantaneo")
-        else:
-            if univocamente_decodificable(cod):
-                print("Es Univocamente Decodificable")
-            else:
-                print("No es Univocamente Decodificable")
-            print("No es Instantaneo")
+    if not nosingular(cod):
+        print("Clasificacion: Codigo Bloque (Singular)")
     else:
-        print("Es Singular")
+        if instantaneo(cod):
+            print("Clasificacion: Instantaneo")
+        else:
+            if univocamente_decodificable_print(cod):
+                print("Clasificacion: Univocamente Decodificable")
+            else:
+                print("Clasificacion: No Singular")
+
 
     listaALF = []
     listaLong = []
@@ -557,27 +612,24 @@ def menu_tipo_codigo():
     kraft = inecuacion_kraft(cod, listaALF)
     print("Kraft: ", kraft)
 
-    if univocamente_decodificable(cod):
-        if listaPro:
-            listaInfo = []
-            generar_lista_info_tipo_codigo(listaPro, listaInfo, listaALF)
-            entropia = entropia_tipo_codigo(listaPro, listaInfo)
-            print("Entropia de la Fuente: ", entropia)
+    listaInfo = []
+    generar_lista_info_tipo_codigo(listaPro, listaInfo, listaALF)
+    entropia = entropia_tipo_codigo(listaPro, listaInfo)
+    print("Entropia de la Fuente: ", entropia)
 
-            L_media = long_media(listaPro, listaLong)
-            print("Longitud media: ", L_media)
+    L_media = long_media(listaPro, listaLong)
+    print("Longitud media: ", L_media)
 
-            if compacto(cod, listaInfo, listaLong):
-                print("Es Compacto")
-            else:
-                print("No es Compacto")
+    if compacto(cod, listaInfo, listaLong):
+        print("Es Compacto")
+    else:
+        print("No es Compacto")
 
-            prediccion = []
-            montecarlo_tipo_codigo(N_MONTECARLO_6, cod, listaPro, prediccion)
-            print("Prediccion Monte Carlo:", prediccion)
-        else:
-            print("LISTAPRO_6 esta vacia: cargala en el bloque de datos si queres "
-                  "entropia, longitud media, compacidad y Monte Carlo.")
+    prediccion = []
+    montecarlo_tipo_codigo(N_MONTECARLO_6, cod, listaPro, prediccion)
+    print("Prediccion Monte Carlo:", prediccion)
+    
+
 
 
 # ==========================================================================
