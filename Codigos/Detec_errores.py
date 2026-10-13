@@ -1,7 +1,6 @@
 def paridad_par(char):
-    binario = bin(ord(char))
-    binario = binario[2:] # Hago slicing para deshacerme de "0b"
-
+    binario = format(ord(char), '07b')
+    
     cant = 0
     for bit in binario:
         if(bit == '1'):
