@@ -3,7 +3,7 @@ import random
 from math import log2
 
 # ---------------- DATOS DE ENTRADA (editar aca) --------------------------
-COD_6 = ["(]", "]", "[)", ")", "(["]           # Ingresa Codigo, ej: ["0", "10", "110", "111"]
+COD_6 = ["/+", "*", "+-", "-", "*/"]           # Ingresa Codigo, ej: ["0", "10", "110", "111"]
 LISTAPRO_6 = [0.15, 0.25, 0.05, 0.45, 0.10]       # Probabilidades de cada palabra-codigo, ej: [0.5, 0.25, 0.125, 0.125]
 N_MONTECARLO_6 = 5     # cantidad de simbolos a predecir con Monte Carlo (al final)
 # ---------------------------------------------------------------------------

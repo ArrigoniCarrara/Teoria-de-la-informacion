@@ -16,12 +16,12 @@ def extension_fuente(alfabeto, distribucion, N, nuevoAlfabeto, nuevaDistribucion
     nuevaDistribucion.extend(pro)  
 
 
-
-listaAlf = ['x', 'y', 'z'] 
-listaPro = [0.5, 0.1, 0.4]
-num = 3
-nuevoAlf = []
-nuevoPro = []
-extension_fuente(listaAlf, listaPro, num, nuevoAlf, nuevoPro)
-print(nuevoAlf)   
-print(nuevoPro)  
+if __name__ == "__main__":
+    listaAlf = ['x', 'y', 'z'] 
+    listaPro = [0.5, 0.1, 0.4]
+    num = 3
+    nuevoAlf = []
+    nuevoPro = []
+    extension_fuente(listaAlf, listaPro, num, nuevoAlf, nuevoPro)
+    print(nuevoAlf)   
+    print(nuevoPro)  

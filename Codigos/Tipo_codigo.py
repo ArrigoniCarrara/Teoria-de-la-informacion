@@ -96,10 +96,8 @@ def Entropia(lista, listaInfo):
 
 def Generolista (lista, listaInfo):
     r = len(listaALF)
-    print("T(Pi): ")
     for num in lista:
          listaInfo.append(math.log(1/num, r))
-         print("I(", num, ") = ", math.log(1/num, r))
 
 def Compacto(cod, listaInfo, listaLong):
     bool = True
@@ -111,23 +109,26 @@ def Compacto(cod, listaInfo, listaLong):
 
     return bool
 
-cod = [".,", ";", ",,", ":", "...", ",:;"]
-listaPro = [0.10, 0.5, 0.10, 0.20, 0.05, 0.05]
+def Rendimiento(H, L):
+    if(L != 0):
+        return H/L
+    print("L = 0 (ERROR)")
+    return -1
+
+cod = ["11", "001", "000", "10", "01"]
+listaPro = [0.2, 0.15, 0.1, 0.3, 0.25]
 print(cod)
 
-if(nosingular(cod)):
-    print("Es No Singular")
-    if(instantaneo(cod)):
-        print("Es Univocamente Decodificable")
-        print("Es Instantaneo")
-    else:
-        if(univocamente_decodificable(cod)):
-            print("Es Univocamente Decodificable")
-        else:
-            print("No es Univocamente Decodificable")
-        print("No es Instantaneo")
+if not nosingular(cod):
+    print("Clasificacion: Codigo Bloque (Singular)")
 else:
-    print("Es Singular")
+    if instantaneo(cod):
+        print("Clasificacion: Instantaneo")
+    else:
+        if univocamente_decodificable(cod):
+            print("Clasificacion: Univocamente Decodificable")
+        else:
+            print("Clasificacion: No Singular")
 
 
 listaALF = []
@@ -153,6 +154,9 @@ if (univocamente_decodificable(cod)):
         print("Es Compacto")
     else:
         print("No es Compacto")
+    rendimiento = Rendimiento(entropia, L_media)
+    print("Eficiencia o Rendimiento: ", rendimiento)
+    print("Redundancia: ", 1 - rendimiento)
 
 n = int(input())
 prediccion = []
