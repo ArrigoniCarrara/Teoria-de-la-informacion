@@ -50,12 +50,12 @@ def metricas(probs, codigos):
 
 if __name__ == "__main__":
     pro = [0.20, 0.27, 0.40, 0.13]
-    codigos = shannon_fano(pro)
-    for p, c in zip(pro, codigos):
-        print(f"{p:.2f} -> {c}")
+    codigo = shannon_fano(pro)
+    for p, c in zip(pro, codigo):
+        print(f"{p} -> {c}")
 
-    H, L, eta, R = metricas(pro, codigos)
-    print(f"H(S) = {H:.2f} bits")
-    print(f"L = {L:.2f} bits")
-    print(f"η = {eta:.4f}")
-    print(f"R = {R:.4f}")
+    h, l, eta, r = metricas(pro, codigo)
+    print(f"H(S) = {h} bits")
+    print(f"L = {l} bits")
+    print(f"η = {eta}")
+    print(f"R = {r}")
