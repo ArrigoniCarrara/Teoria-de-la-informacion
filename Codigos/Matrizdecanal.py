@@ -6,7 +6,7 @@ def listas_paralelas(cadena, listaALF, listaPro):
             listaALF.append(char)
             listaPro.append(cadena.count(char) / long)
 
-    parejas_ordenadas = sorted(zip(listaALF, listaPro), key=lambda x: ord(x[0])) # Ordeno los eventos para mayor comodidad (en el orden que corresponda)
+    parejas_ordenadas = sorted(zip(listaALF, listaPro), key=lambda x: ord(x[0]))  # Ordeno los eventos para mayor comodidad
 
     listaALF.clear()
     listaPro.clear()
@@ -15,35 +15,43 @@ def listas_paralelas(cadena, listaALF, listaPro):
         listaALF.append(char)
         listaPro.append(pro)
 
-def proba(cad, cod, car):
-    cant_0 = 0
-    cant_1 = 0
-    for i in range(len(cad)):
-        if car == cad[i]:
-            if cod[i] == '0':
-                cant_0 = cant_0 + 1
-            else:
-                cant_1 = cant_1 + 1
-    deno = cant_0 + cant_1
-    return cant_0/deno, cant_1/deno
-    
 
-def generoMC(mat, n,cad, cod, pro, alf):
-    m = 2 # Codigo binario
+def proba(cad, sal, car_ent, alfSalida):
+    cantidades = [0 for _ in range(len(alfSalida))]
+    for i in range(len(cad)):
+        if cad[i] == car_ent:
+            cantidades[alfSalida.index(sal[i])] += 1
+    deno = sum(cantidades)
+    return [c / deno for c in cantidades]
+
+
+def generoMC(mat, n, m, cad, sal, alfEntrada, alfSalida):
     for poscar in range(n):
-        cant_0, cant_1 = proba(cad, cod, alf[poscar])
-        mat[poscar][0] = cant_0
-        mat[poscar][1] = cant_1
+        fila = proba(cad, sal, alfEntrada[poscar], alfSalida)
+        for j in range(m):
+            mat[poscar][j] = fila[j]
+
 
 if __name__ == "__main__":
-    cadenafuente = "abcacaabbcacaabcacaaabcaca"
-    codigo = "01010110011001000100010011"
-    listaALF = []
-    listaPro = []
-    listas_paralelas(cadenafuente, listaALF, listaPro)
-    n = len(listaALF)
+    cadenaEntrada = "1101011001101010010101010100011111"
+    cadenaSalida = "1001111111100011101101010111110110"
 
-    matriz = [[0 for _ in range(2)] for _ in range(n)]
+    alfEntrada = []
+    proEntrada = []
+    listas_paralelas(cadenaEntrada, alfEntrada, proEntrada)
 
-    generoMC(matriz, n,cadenafuente, codigo, listaPro, listaALF)
-    print(matriz)
+    alfSalida = []
+    proSalida = []
+    listas_paralelas(cadenaSalida, alfSalida, proSalida)
+
+    n = len(alfEntrada)   # cantidad de símbolos de entrada
+    m = len(alfSalida)    # cantidad de símbolos de salida
+
+    matriz = [[0 for _ in range(m)] for _ in range(n)]
+
+    generoMC(matriz, n, m, cadenaEntrada, cadenaSalida, alfEntrada, alfSalida)
+
+    print("Alfabeto entrada:", alfEntrada, "Probabilidades a priori:", proEntrada)
+    print("Alfabeto salida:", alfSalida, "Probabilidades salida:", proSalida)
+    for i in range(n):
+        print(alfEntrada[i], matriz[i])
