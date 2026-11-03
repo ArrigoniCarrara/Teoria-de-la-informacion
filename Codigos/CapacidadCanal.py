@@ -179,4 +179,4 @@ def analizar(nombre, canal):
 if __name__ == "__main__":
     analizar("Ejercicio",
              [[0.77, 0.23],
-             [0.20, 0.80]])
+            [0.20, 0.80]])

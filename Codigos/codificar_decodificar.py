@@ -1,4 +1,5 @@
 import Huffman
+
 def codifico(cad, alfabeto, codigo):
     cod = ""
     for car in cad:
@@ -32,8 +33,8 @@ def tasa_compresion(cadena_original, cadena_codificada): # NO VEO QUE ESTO ESTE 
     return bits_originales / bits_comprimidos
     
 if __name__ == "__main__":
-    cad = "HOLA"
-    alfabeto = " ,.:;ABCDEFGHIJKLMNÑOQRSTUVWXYZ"  
+    cad = "LAS PROBE CON TU ALFABETO ORIGINAL, DE TANTOS."
+    alfabeto = " ,.:;ABCDEFGHIJKLMNÑOPQRSTUVWXYZ"  
     pro = [
     0.175990, 0.014093, 0.015034, 0.000542, 0.002109, 0.111066, 0.015368, 0.030176,
     0.038747, 0.101604, 0.004873, 0.008762, 0.007953, 0.049740, 0.003706, 0.000034, 
@@ -53,3 +54,5 @@ if __name__ == "__main__":
 
     tasa = tasa_compresion(cad, cad_codificada)
     print(f"Tasa de compresión: {tasa:.2f}") 
+
+    # Fijarse lo del byte array luego 

@@ -22,7 +22,7 @@ if __name__ == "__main__":
               [0.0, 0.5, 0.5]]
 
     n1 = len(canal1)
-    m1 = len(canal1[0])    # corregido: antes decía len(canal2[0])
+    m1 = len(canal1[0])    
 
     n2 = len(canal2)
     m2 = len(canal2[0])

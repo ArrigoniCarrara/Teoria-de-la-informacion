@@ -33,8 +33,8 @@ def generoMC(mat, n, m, cad, sal, alfEntrada, alfSalida):
 
 
 if __name__ == "__main__":
-    cadenaEntrada = "1101011001101010010101010100011111"
-    cadenaSalida = "1001111111100011101101010111110110"
+    cadenaEntrada = "110101100110101100110101100111110011"
+    cadenaSalida = "110021102110022010220121122100112011"
 
     alfEntrada = []
     proEntrada = []

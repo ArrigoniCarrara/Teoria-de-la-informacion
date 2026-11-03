@@ -118,11 +118,11 @@ def mostrar(nombre, mat):
 
 
 if __name__ == "__main__":
-    priori = [0.12, 0.24, 0.14, 0.50]
-    canal = [[0.25, 0.15, 0.30, 0.30],
-             [0.23, 0.27, 0.25, 0.25],
-             [0.10, 0.40, 0.25, 0.25],
-             [0.34, 0.26, 0.20, 0.20]]
+    priori = [0.25, 0.25, 0.25, 0.25 ]
+    canal = [[1.0, 0.0, 0.0], 
+             [0.0, 1.0, 0.0],
+             [0.0, 1.0, 0.0],
+             [0.0, 0.0, 1.0]]
 
     salida = prob_salida(priori, canal)
     posteriori = matriz_posteriori(priori, canal, salida)
