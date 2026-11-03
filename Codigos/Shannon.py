@@ -1,10 +1,11 @@
 import math
 
+
 def extension_fuente(alfabeto, distribucion, N, nuevoAlfabeto, nuevaDistribucion):
     alf = ['']
     pro = [1]
-    
-    for x in range(N): #cada x++ es un orden
+
+    for x in range(N):  # cada x++ es un orden
         alfTemp = []
         proTemp = []
         for i in range(len(alfabeto)):
@@ -14,8 +15,9 @@ def extension_fuente(alfabeto, distribucion, N, nuevoAlfabeto, nuevaDistribucion
         alf = alfTemp
         pro = proTemp
 
-    nuevoAlfabeto.extend(alf)      
-    nuevaDistribucion.extend(pro) 
+    nuevoAlfabeto.extend(alf)
+    nuevaDistribucion.extend(pro)
+
 
 def InecuacionKraft(cod, listaALF):
     r = len(listaALF)
@@ -24,76 +26,69 @@ def InecuacionKraft(cod, listaALF):
         aux += r ** -len(x)
     return aux
 
+
 def Listas(cod, listaALF, listaLong):
-
-    long = len(cod)
-
     for x in cod:
         listaLong.append(len(x))
-        long = len(x)
-        for i in range(long):
+        for i in range(len(x)):
             if x[i] not in listaALF:
-                listaALF.append(x[i])       
+                listaALF.append(x[i])
+
 
 def nosingular(cod):
-    if(len(cod) != len(set(cod))):
+    if len(cod) != len(set(cod)):
         return False
     return True
 
-def instantaneo(cod):    # IMPORTANTE LOS ELEMENTOS DE LA LISTA DEBEN ESTAR COMO STRING
-    if(nosingular(cod)):  # Lo corroboro igual por si se utiliza fuera del main
-        for i in range(len(cod)): # Un toque ineficiente pero no importa
+
+def instantaneo(cod):  # LOS ELEMENTOS DE LA LISTA DEBEN SER STRINGS
+    if nosingular(cod):
+        for i in range(len(cod)):
             for j in range(len(cod)):
-                if i != j: 
+                if i != j:
                     if cod[i].startswith(cod[j]):
-                        return False # prefijo
+                        return False  # prefijo
     else:
-        return False                
-    return True 
+        return False
+    return True
+
 
 def univocamente_decodificable(cod):
+    if nosingular(cod):
 
-    if(nosingular(cod)):
-
-        if(instantaneo(cod)): # Corroboro que sea singular y si es instantaneo devuelvo True
+        if instantaneo(cod):
             return True
-        
-        C = set(cod)
-        S1 = C 
-        conjuntos_vistos = [] # Lista para ir guardando los S_i
-        S_i = S1 
 
-        while True: #Ciclo Infinito hasta que haya un return
+        C = set(cod)
+        S1 = C
+        conjuntos_vistos = []
+        S_i = S1
+
+        while True:
             S_siguiente = set()
-        
+
             for x in S1:
                 for y in S_i:
-
                     if x != y:
-
                         if y.startswith(x):
                             sufijo = y[len(x):]
                             S_siguiente.add(sufijo)
-                    
                         elif x.startswith(y):
                             sufijo = x[len(y):]
                             S_siguiente.add(sufijo)
-        
-                
-            if not S_siguiente: # Si el conjunto de sufijos está vacio es UD.
+
+            if not S_siguiente:  # conjunto de sufijos vacio: es UD
                 return True
-            
-                
-            if S_siguiente & C: # Si algun S_i contiene una palabra de C, el código no es UD
+
+            if S_siguiente & C:  # algun sufijo es palabra del codigo: no es UD
                 return False
-            
-                
-            if S_siguiente in conjuntos_vistos: # Si se obtiene un S_i que ya aparecio antes, el código es UD
+
+            if S_siguiente in conjuntos_vistos:  # se repitio un S_i: es UD
                 return True
-            
-                
-            conjuntos_vistos.append(S_siguiente) 
+
+            conjuntos_vistos.append(S_siguiente)
             S_i = S_siguiente
+    return False
 
 
 def Long_media(listaPro, listaLong):
@@ -111,80 +106,131 @@ def Entropia(lista, listaInfo):
         i = i + 1
     return entropia
 
-def Generolista (lista, listaInfo, listaALF):
+
+def Generolista(lista, listaInfo, listaALF):
     r = len(listaALF)
     for num in lista:
-         listaInfo.append(math.log(1/num, r))
+        listaInfo.append(math.log(1 / num, r))
+
 
 def Compacto(cod, listaInfo, listaLong):
     bool = True
-    if(univocamente_decodificable(cod)):
+    if univocamente_decodificable(cod):
         for i in range(len(listaInfo)):
-            if(math.ceil(listaInfo[i]) < listaLong[i]):
+            if math.ceil(listaInfo[i]) < listaLong[i]:
                 bool = False
                 break
-
     return bool
 
-def cumple_shannon(cod, pro, n, listaALF):
+
+def cumple_shannon(pro, cod, N):
+    # pro: distribucion de la fuente original
+    # cod: palabras del codigo ORIGINAL (orden 1)
+    # N:   orden de la extension (si N = 1 es el codigo sin extension)
+
+    if not univocamente_decodificable(cod):
+        return False
+
+    listaALF = []
+    listaLong = []
+    Listas(cod, listaALF, listaLong)
+
+    
     nuevoCod = []
     nuevoPro = []
-    listainfo = []
-    extension_fuente(cod, pro, n, nuevoCod, nuevoPro)
+    extension_fuente(cod, pro, N, nuevoCod, nuevoPro)
+
+    # Nombres de los simbolos de la extension (solo para mostrar la tabla)
+    simbolos = []
+    for i in range(len(pro)):
+        simbolos.append("s" + str(i + 1))
+    nombres = []
+    otraPro = []
+    extension_fuente(simbolos, pro, N, nombres, otraPro)
 
     longitudes = []
     for palabra in nuevoCod:
         longitudes.append(len(palabra))
 
+    print("  Simbolo  Prob.  Palabra codigo  Li")
+    for i in range(len(nombres)):
+        print("  ", nombres[i], round(nuevoPro[i], 4), nuevoCod[i], longitudes[i])
+
+    
     Ln = Long_media(nuevoPro, longitudes)
 
-    Generolista(nuevoPro, listainfo, listaALF)   # ahora r = 3
-    h_extension = Entropia(nuevoPro, listainfo)
-    h = h_extension / n
-
-    print(f"n = {n}  |  H_{len(listaALF)}(S) = {h:.2f}  |  L{n} = {Ln:.2f}")
-
-    cota_inferior = h - 1e-9
-    cota_superior = h + 1 / n
-    return cota_inferior <= Ln / n < cota_superior
-
-cod = ["0", "100", "101", "11100", "110", "11101", "11110", "11111"]
-listaPro = [0.512, 0.128, 0.128, 0.032, 0.128, 0.032, 0.032, 0.008 ]
-print(cod)
-
-if not nosingular(cod):
-    print("Clasificacion: Codigo Bloque (Singular)")
-else:
-    if instantaneo(cod):
-        print("Clasificacion: Instantaneo")
-    else:
-        if univocamente_decodificable(cod):
-            print("Clasificacion: Univocamente Decodificable")
-        else:
-            print("Clasificacion: No Singular")
-
-listaALF = []
-listaLong = []
-Listas(cod, listaALF, listaLong)
-print("Lista alfabeto: ", listaALF)
-print("Lista Li: ", listaLong)
-
-kraft = InecuacionKraft(cod, listaALF)
-print("Kraft: ", kraft)
-if (univocamente_decodificable(cod)):
+    
     listaInfo = []
+    Generolista(pro, listaInfo, listaALF)
+    h = Entropia(pro, listaInfo)
 
-    Generolista(listaPro, listaInfo, listaALF)
-    entropia = Entropia(listaPro, listaInfo)
-    print("Entropia de la Fuente: ", entropia)
+    promedio = Ln / N
+    cota_inferior = h
+    cota_superior = h + 1 / N
 
-    L_media = Long_media(listaPro, listaLong)
+    print("  N =", N)
+    print("  r =", len(listaALF))
+    print("  H_r(S) =", round(h, 4))
+    print("  L_N =", round(Ln, 4))
+    print("  L_N / N =", round(promedio, 4))
+    print("  Cota:", round(cota_inferior, 4), "<= L_N/N <", round(cota_superior, 4))
 
-    print("Longitud media: ", L_media)
+    cumple_inferior = promedio >= cota_inferior - 0.000000001
+    cumple_superior = promedio < cota_superior
+    return cumple_inferior and cumple_superior
 
-    if(Compacto(cod, listaInfo, listaLong)):
-        print("Es Compacto")
+
+if __name__ == "__main__":
+
+    # ---------- Parte 1: clasificacion de un codigo ----------
+    cod = ["BA", "CAB", "A", "CBA"]
+    listaPro = [0.3, 0.1, 0.4, 0.2]
+    print(cod)
+
+    if not nosingular(cod):
+        print("Clasificacion: Codigo Bloque (Singular)")
     else:
-        print("No es Compacto")
+        if instantaneo(cod):
+            print("Clasificacion: Instantaneo")
+        else:
+            if univocamente_decodificable(cod):
+                print("Clasificacion: Univocamente Decodificable")
+            else:
+                print("Clasificacion: No Singular")
 
-print("Cumple Shannon" if cumple_shannon(cod, listaPro, 1, listaALF) else "No cumple Shannon")
+    listaALF = []
+    listaLong = []
+    Listas(cod, listaALF, listaLong)
+    print("Lista alfabeto: ", listaALF)
+    print("Lista Li: ", listaLong)
+
+    kraft = InecuacionKraft(cod, listaALF)
+    print("Kraft: ", kraft)
+
+    if univocamente_decodificable(cod):
+        listaInfo = []
+        Generolista(listaPro, listaInfo, listaALF)
+        entropia = Entropia(listaPro, listaInfo)
+        print("Entropia de la Fuente: ", entropia)
+
+        L_media = Long_media(listaPro, listaLong)
+        print("Longitud media: ", L_media)
+
+        if Compacto(cod, listaInfo, listaLong):
+            print("Es Compacto")
+        else:
+            print("No es Compacto")
+
+    # ---------- Parte 2: Primer Teorema de Shannon ----------
+    print()
+    print("===== Primer Teorema de Shannon =====")
+
+    ordenes = [1, 2]   
+
+    for N in ordenes:
+        if N == 1:
+            print("Codigo original (sin extension)")
+        else:
+            print("Extension de orden", N)
+        print("Cumple Shannon:", cumple_shannon(listaPro, cod, N))
+        print()
