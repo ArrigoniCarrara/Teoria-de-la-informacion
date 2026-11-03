@@ -26,10 +26,10 @@ def verificar(binario):
     return char_paridad == binario[len(binario) - 1]
 
 if __name__ == "__main__":
-    char = '/'
+    char = 'a'
     binario = paridad_par(char)
     print("Binario con ultimo bit de paridad: ", binario)
-
+    
     if(verificar(binario)):
         print("Correcto")
     else:

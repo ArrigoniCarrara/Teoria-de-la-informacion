@@ -48,7 +48,7 @@ def codificar(items):
     arriba = items[:mejor_corte]
     abajo = items[mejor_corte:]
 
-    # Se asigna un bit a cada grupo (igual que el PDF: 1 arriba, 0 abajo)
+    # Se asigna un bit a cada grupo 
     for item in arriba:
         item[1] += "1"
     for item in abajo:
@@ -67,18 +67,35 @@ def metricas(probs, codigos):
 
 
 if __name__ == "__main__":
-    cadena = "58784784525368669895745123656253698989656452121702300223659"
-    listaALF = []
-    pro = []
-    listas_paralelas(cadena, listaALF, pro)
-    codigo = shannon_fano(pro)
+    CAD = True
+    if (CAD):
+        cadena = "AOEAOEOOOOEOAOEOOEOOEOAOAOEOEUUUIEOEOEO"
+        listaALF = []
+        pro = []
+        listas_paralelas(cadena, listaALF, pro)
+        codigo = shannon_fano(pro)
+        print(f"{'Símbolo':<8} {'Prob.':<10} Código") #Imprime SIMBOLO PROBABILIDAD CODIGO
+        for s, p, c in zip(listaALF, pro, codigo):
+            print(f"{s:<8} {p:<10.4f} {c}")
+        
+        h, l, n, r = metricas(pro, codigo)
+        print(f"H(S) = {h} bits")
+        print(f"L = {l} bits")
+        print(f"η = {n}")
+        print(f"R = {r}")
+    else:
+        pro = [0.4, 0.25, 0.25, 0.1]
+        codigo = shannon_fano(pro)
+        print(f"{'Símbolo':<8} {'Prob.':<10} Código") #Imprime SIMBOLO PROBABILIDAD CODIGO
+        for p, c in zip(pro, codigo):
+            print(f"{p:<10.4f} {c}")
+        
+        h, l, n, r = metricas(pro, codigo)
+        print(f"H(S) = {h} bits")
+        print(f"L = {l} bits")
+        print(f"η = {n}")
+        print(f"R = {r}")
 
-    print(f"{'Símbolo':<8} {'Prob.':<10} Código") #Imprime SIMBOLO PROBABILIDAD CODIGO
-    for s, p, c in zip(listaALF, pro, codigo):
-        print(f"{s:<8} {p:<10.4f} {c}")
+    
 
-    h, l, n, r = metricas(pro, codigo)
-    print(f"H(S) = {h} bits")
-    print(f"L = {l} bits")
-    print(f"η = {n}")
-    print(f"R = {r}")
+    

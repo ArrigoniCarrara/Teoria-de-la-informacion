@@ -1,6 +1,5 @@
 import math
 
-
 def extension_fuente(alfabeto, distribucion, N, nuevoAlfabeto, nuevaDistribucion):
     alf = ['']
     pro = [1]
@@ -123,10 +122,11 @@ def Compacto(cod, listaInfo, listaLong):
     return bool
 
 
-def cumple_shannon(pro, cod, N):
+def cumple_shannon(pro, cod, N, es_extension=False):
     # pro: distribucion de la fuente original
-    # cod: palabras del codigo ORIGINAL (orden 1)
-    # N:   orden de la extension (si N = 1 es el codigo sin extension)
+    # cod: si es_extension es False -> codigo ORIGINAL (la extension se arma sola)
+    #      si es_extension es True  -> palabras de la extension de orden N (ya hechas)
+    # N:   orden de la extension
 
     if not univocamente_decodificable(cod):
         return False
@@ -135,18 +135,23 @@ def cumple_shannon(pro, cod, N):
     listaLong = []
     Listas(cod, listaALF, listaLong)
 
-    
-    nuevoCod = []
-    nuevoPro = []
-    extension_fuente(cod, pro, N, nuevoCod, nuevoPro)
-
-    # Nombres de los simbolos de la extension (solo para mostrar la tabla)
+    # Nombres de los simbolos de la extension y sus probabilidades
     simbolos = []
     for i in range(len(pro)):
         simbolos.append("s" + str(i + 1))
     nombres = []
-    otraPro = []
-    extension_fuente(simbolos, pro, N, nombres, otraPro)
+    nuevoPro = []
+    extension_fuente(simbolos, pro, N, nombres, nuevoPro)
+
+    if es_extension:
+        if len(cod) != len(pro) ** N:
+            print("Hacen falta len(pro) ** N palabras codigo")
+            return False
+        nuevoCod = cod
+    else:
+        nuevoCod = []
+        otraPro = []
+        extension_fuente(cod, pro, N, nuevoCod, otraPro)
 
     longitudes = []
     for palabra in nuevoCod:
@@ -156,10 +161,8 @@ def cumple_shannon(pro, cod, N):
     for i in range(len(nombres)):
         print("  ", nombres[i], round(nuevoPro[i], 4), nuevoCod[i], longitudes[i])
 
-    
     Ln = Long_media(nuevoPro, longitudes)
 
-    
     listaInfo = []
     Generolista(pro, listaInfo, listaALF)
     h = Entropia(pro, listaInfo)
@@ -183,8 +186,8 @@ def cumple_shannon(pro, cod, N):
 if __name__ == "__main__":
 
     # ---------- Parte 1: clasificacion de un codigo ----------
-    cod = ["BA", "CAB", "A", "CBA"]
-    listaPro = [0.3, 0.1, 0.4, 0.2]
+    cod = ["11", "010", "00"]
+    listaPro = [0.5, 0.2, 0.3]
     print(cod)
 
     if not nosingular(cod):
@@ -234,3 +237,15 @@ if __name__ == "__main__":
             print("Extension de orden", N)
         print("Cumple Shannon:", cumple_shannon(listaPro, cod, N))
         print()
+
+    # Uso de funcion cuando ya nos dan la extension de orden n
+    pro = [0.5, 0.2, 0.3]
+    C1 = ["11", "010", "00"]
+    C2 = ["10", "001", "110", "010", "0000", "0001", "111", "0110", "0111"]
+
+    print("C1 (orden 1):")
+    print("Cumple Shannon:", cumple_shannon(pro, C1, 1))
+    print()
+
+    print("C2 (extension de orden 2):")
+    print("Cumple Shannon:", cumple_shannon(pro, C2, 2, True))
