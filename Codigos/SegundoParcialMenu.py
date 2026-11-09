@@ -2,10 +2,6 @@
 ==========================================================================
  TEORIA DE LA INFORMACION - MENU POR TEMAS (VALORES HARDCODEADOS)
 ==========================================================================
-Mismo esquema que TeoriaInformacion_MenuHARD.py: cada modulo tiene un
-bloque de "DATOS DE ENTRADA" con variables hardcodeadas. Antes de ejecutar,
-edita el bloque del modulo que vayas a usar, elegi el tema en el menu
-principal y despues el modulo en el submenu.
 
 Temas y modulos:
 
@@ -564,9 +560,9 @@ def menu_paridad():
 # ==========================================================================
 
 # ---------------- DATOS DE ENTRADA (editar aca) --------------------------
-RM_CADENA = "Miercoles"   # mensaje ASCII para generar los bytes con paridad
+RM_CADENA = "SOL"   # mensaje ASCII para generar los bytes con paridad
 # Matriz dada (un byte por fila) para recuperar el mensaje, p. ej. de un ejercicio
-RM_MATRIZ = [0b00111110, 0b10000111, 0b10010000, 0b10000010, 0b10101010]
+RM_MATRIZ = [0b10100000, 0b10101110, 0b10011111, 0b10011001]
 # ---------------------------------------------------------------------------
 
 
@@ -1257,25 +1253,12 @@ CAP_CANAL = [[0.77, 0.23],
              [0.20, 0.80]]
 # ---------------------------------------------------------------------------
 
-
 def entropia(valores):
     h = 0
     for p in valores:
         if p > 0:
             h = h - p * log2(p)
     return h
-
-
-def es_uniforme(canal):
-    primera = sorted(canal[0])
-
-    for fila in canal:
-        actual = sorted(fila)
-        for k in range(len(primera)):
-            diferencia = abs(primera[k] - actual[k])
-            if diferencia > 0.000001:
-                return False
-    return True
 
 
 def es_determinante(canal):
@@ -1333,12 +1316,6 @@ def capacidad_sin_ruido(canal):
     return log2(n)
 
 
-def capacidad_uniforme(canal):
-    # C = log2(m) - H(fila)
-    m = len(canal[0])
-    h_fila = entropia(canal[0])
-    return log2(m) - h_fila
-
 
 def tipos_de_canal(canal):
     # Devuelve una lista con TODOS los tipos que cumple el canal
@@ -1347,8 +1324,6 @@ def tipos_de_canal(canal):
         tipos.append("sin ruido")
     if es_determinante(canal):
         tipos.append("determinante")
-    if es_uniforme(canal):
-        tipos.append("uniforme")
     return tipos
 
 
@@ -1357,7 +1332,6 @@ def capacidad_por_tipo(canal, tipo):
         return capacidad_sin_ruido(canal)
     if tipo == "determinante":
         return capacidad_determinante(canal)
-    return capacidad_uniforme(canal)
 
 
 def informacion_mutua_canal(canal, pa):
@@ -1430,7 +1404,7 @@ def menu_capacidad_canal():
             c = capacidad_por_tipo(canal, tipo)
             print("  Capacidad como", tipo, ":", round(c, 4), "bits/simbolo")
     else:
-        print("  No es sin ruido, determinante ni uniforme")
+        print("  No es sin ruido ni determinante")
         if len(canal) == 2:
             p, c = capacidad_general(canal)
             print("  Capacidad:", round(c, 4), "bits/simbolo, con p(x1) =", round(p, 4))
@@ -1484,7 +1458,7 @@ def menu_capacidad_paso():
 # ==========================================================================
 
 # ---------------- DATOS DE ENTRADA (editar aca) --------------------------
-PE_PA = [4/15, 3/15, 8/15]          # probabilidades a priori
+PE_PA = [1/8, 3/8, 4/8]          # probabilidades a priori
 PE_CANAL = [[0.6, 0.3, 0.1],        # canal[i][j] = P(b_j | a_i)
             [0.1, 0.8, 0.1],
             [0.3, 0.3, 0.4]]
@@ -1621,7 +1595,7 @@ OPCIONES_3 = {
           " un elemento no nulo) y/o determinante (cada fila tiene a lo sumo uno)."),
     "6": ("Tipo de canal y capacidad                       [CAP_NOMBRE, CAP_CANAL]",
           menu_capacidad_canal,
-          "Indica si el canal es sin ruido, determinante y/o uniforme y calcula la"
+          "Indica si el canal es sin ruido, determinante y calcula la"
           " capacidad de cada tipo. Si no es de ninguno y tiene 2 entradas, busca la"
           " capacidad refinando el valor de p en varias rondas."),
     "7": ("Capacidad estimada con paso (canal binario)     [PASO_CANAL, PASO_PASOS]",
