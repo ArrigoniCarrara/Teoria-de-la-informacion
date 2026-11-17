@@ -302,15 +302,15 @@ def informacion_mutua_canal(canal, pa):
 def capacidad_general(canal):
     mejor_p = 0.5
     mejor_info = -1
-
+    
     desde = 0.1
     hasta = 0.9
     paso = 0.1
-
+    
     for ronda in range(6):
         print("  Ronda", ronda + 1, ": p de", round(desde, 6), "a", round(hasta, 6),
-              "con paso", paso)
-
+                "con paso", paso)
+    
         p = desde
         while p <= hasta + 0.0000001:
             pa = [p, 1 - p]
@@ -319,10 +319,11 @@ def capacidad_general(canal):
                 mejor_info = info
                 mejor_p = p
             p = p + paso
-
+    
         print("    Mejor hasta ahora: p =", round(mejor_p, 6),
-              " I =", round(mejor_info, 6))
-
+                " 1 - p =", round(1 - mejor_p, 6),
+                " I =", round(mejor_info, 6))
+    
         desde = mejor_p - paso
         hasta = mejor_p + paso
         paso = paso / 10
@@ -330,7 +331,7 @@ def capacidad_general(canal):
             desde = 0
         if hasta > 1:
             hasta = 1
-
+    
     return mejor_p, mejor_info
 
 
@@ -430,8 +431,8 @@ def recuperar_mensaje(datos):
             cadena_corregida += str(bit)
 
     texto = ""
-    for i in range(filas):
-        codigo = bits_a_byte(matriz[i])
+    for i in range(1, filas):
+        codigo = bits_a_byte(matriz[i][:7])
         texto += chr(codigo)
 
     return cadena_corregida, texto
@@ -524,5 +525,6 @@ if __name__ == "__main__":
 
     cadena_corr, texto = recuperar_mensaje(matriz_errores)
 
-    print("Cadena de entrada original: ", cadenaEntrada)
-    print("Cadena de entrada corregida:", cadena_corr)
+    if cadena_corr != "":
+        print("Mensaje corregido (bits): ", cadena_corr)
+        print("Mensaje corregido (texto):", texto)
